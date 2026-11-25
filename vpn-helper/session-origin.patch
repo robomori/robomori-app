@@ -1,0 +1,47 @@
+diff -ru a/src/hev-socks5-session-tcp.c b/src/hev-socks5-session-tcp.c
+--- a/src/hev-socks5-session-tcp.c
++++ b/src/hev-socks5-session-tcp.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include <errno.h>
++#include <stdio.h>
+ #include <string.h>
+ 
+ #include <lwip/tcp.h>
+@@ -330,6 +331,23 @@
+     LOG_D ("%p socks5 session tcp construct", self);
+ 
+     HEV_OBJECT (self)->klass = HEV_SOCKS5_SESSION_TCP_TYPE;
++
++    /*
++     * Robomori: names the app's end and the address it dialed, as
++     * "<app address> <app port> <dialed address> <dialed port>", so the
++     * server can ask Android which app owns the connection.
++     */
++    {
++        char app[64], dialed[64];
++
++        if (ipaddr_ntoa_r (&pcb->remote_ip, app, sizeof (app)) &&
++            ipaddr_ntoa_r (&pcb->local_ip, dialed, sizeof (dialed))) {
++            snprintf (self->origin, sizeof (self->origin), "%s %u %s %u", app,
++                      pcb->remote_port, dialed, pcb->local_port);
++            hev_socks5_client_set_auth (HEV_SOCKS5_CLIENT (self), self->origin,
++                                        "-");
++        }
++    }
+ 
+     tcp_arg (pcb, self);
+     tcp_recv (pcb, tcp_recv_handler);
+diff -ru a/src/hev-socks5-session-tcp.h b/src/hev-socks5-session-tcp.h
+--- a/src/hev-socks5-session-tcp.h
++++ b/src/hev-socks5-session-tcp.h
+@@ -33,6 +33,8 @@
+     HevTaskMutex *mutex;
+     HevRingBuffer *buffer;
+     int pcb_eof;
++    /* Robomori: the connection's addresses, sent as the SOCKS5 username. */
++    char origin[128];
+ };
+ 
+ struct _HevSocks5SessionTCPClass

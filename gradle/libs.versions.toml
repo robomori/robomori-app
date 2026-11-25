@@ -1,0 +1,47 @@
+[versions]
+kotlin = "2.4.0"
+compose = "1.12.0"
+nucleus = "2.5.18"
+grpc = "1.85.0"
+compose-unstyled = "2.10.2"
+
+[libraries]
+kotlinx-coroutines-swing = "org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.11.0"
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
+nucleus-updater-runtime = { module = "dev.nucleusframework:nucleus.updater-runtime", version.ref = "nucleus" }
+nucleus-aot-runtime = { module = "dev.nucleusframework:nucleus.aot-runtime", version.ref = "nucleus" }
+grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+snakeyaml = "org.yaml:snakeyaml:2.5"
+compose-unstyled-button = { module = "com.composables:composeunstyled-button", version.ref = "compose-unstyled" }
+compose-unstyled-dialog = { module = "com.composables:composeunstyled-dialog", version.ref = "compose-unstyled" }
+compose-unstyled-drawer = { module = "com.composables:composeunstyled-drawer", version.ref = "compose-unstyled" }
+compose-unstyled-dropdown-menu = { module = "com.composables:composeunstyled-dropdown-menu", version.ref = "compose-unstyled" }
+compose-unstyled-focus-ring = { module = "com.composables:composeunstyled-focus-ring", version.ref = "compose-unstyled" }
+compose-unstyled-progress = { module = "com.composables:composeunstyled-progress", version.ref = "compose-unstyled" }
+compose-unstyled-slider = { module = "com.composables:composeunstyled-slider", version.ref = "compose-unstyled" }
+compose-unstyled-text-field = { module = "com.composables:composeunstyled-text-field", version.ref = "compose-unstyled" }
+compose-unstyled-theming = { module = "com.composables:composeunstyled-theming", version.ref = "compose-unstyled" }
+compose-unstyled-toggle-switch = { module = "com.composables:composeunstyled-toggle-switch", version.ref = "compose-unstyled" }
+compose-unstyled-tooltip = { module = "com.composables:composeunstyled-tooltip", version.ref = "compose-unstyled" }
+ripple-indication = "com.composables:ripple-indication:1.1.1"
+filekit-dialogs = "io.github.vinceglb:filekit-dialogs:0.16.0"
+jna = "net.java.dev.jna:jna:5.19.1"
+jcodec = "org.jcodec:jcodec:0.2.5"
+zxing-core = "com.google.zxing:core:3.5.3"
+simple-analytics = "com.alexstyl:simple-analytics-kotlin:0.2.0"
+bouncycastle-pkix = "org.bouncycastle:bcpkix-jdk18on:1.80.2"
+# Decode Brotli and zstd network bodies; both pure Java. aircompressor 2.x needs Java 22.
+brotli-dec = "org.brotli:dec:0.1.2"
+aircompressor = "io.airlift:aircompressor:0.27"
+sqlite-jdbc = "org.xerial:sqlite-jdbc:3.50.3.0"
+# Build logic in buildSrc.
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
+
+[plugins]
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+nucleus = { id = "dev.nucleusframework", version.ref = "nucleus" }
+protobuf = "com.google.protobuf:0.10.0"
+google-fonts = "com.composables.google-fonts:0.2.1"

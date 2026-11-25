@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The traffic arrows in white, inside the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:scaleX="2" android:scaleY="2" android:translateX="30" android:translateY="30">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M7,3L3,7l4,4V8h9V6H7V3zM17,13v3H8v2h9v3l4,-4l-4,-4z" />
+    </group>
+</vector>

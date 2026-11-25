@@ -1,0 +1,19 @@
+# Google Fonts lockfile. Commit this file. Delete an entry to resolve it again.
+Inter.license.family=Inter
+Inter.license.sha256=5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57
+Inter.license.url=https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt
+JetBrainsMono.license.family=JetBrains+Mono
+JetBrainsMono.license.sha256=b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d
+JetBrainsMono.license.url=https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt
+googlefonts_inter_400_normal.family=Inter
+googlefonts_inter_400_normal.sha256=1b08e7fc267a5c7e1d614100f604b83e7e8a0be241f0f288faa2b3ac93a683ba
+googlefonts_inter_400_normal.url=https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf
+googlefonts_inter_600_normal.family=Inter
+googlefonts_inter_600_normal.sha256=e7a1aaf7eda9f2fad4131725fa556265ec75ca7b2d756260173a040363e8d4f7
+googlefonts_inter_600_normal.url=https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf
+googlefonts_inter_700_normal.family=Inter
+googlefonts_inter_700_normal.sha256=b37284b5701b6b168dfc770aa1a4ac492106422fd3ba76bc7641e37434e8019c
+googlefonts_inter_700_normal.url=https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf
+googlefonts_jetbrainsmono_400_normal.family=JetBrains+Mono
+googlefonts_jetbrainsmono_400_normal.sha256=44ce4a84f20d60f24539bd0cef11f79c29e38609e0f8adf18551c9794a5d9dc3
+googlefonts_jetbrainsmono_400_normal.url=https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjPQ.ttf

@@ -1,0 +1,7 @@
+Android camera shutter sound
+Copyright The Android Open Source Project
+Distributed under the Apache License, Version 2.0; see android-device-art-Apache-2.0.txt.
+Source: https://android.googlesource.com/platform/frameworks/base
+Revision: 1cdfff555f4a21f71ccc978290e2e212e2f8b168
+File: data/sounds/effects/ogg/camera_click.ogg
+Bundled as sounds/camera-click.wav, converted from Ogg Vorbis to WAV without other changes.

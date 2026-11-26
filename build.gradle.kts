@@ -279,7 +279,7 @@ nucleus {
             }
             description = "The companion app for Android developers and AI coding agents"
             vendor = "Alex Styl"
-            modules("java.net.http", "java.prefs", "java.xml", "jdk.unsupported")
+            modules("java.net.http", "java.prefs", "java.sql", "java.xml", "jdk.security.auth", "jdk.unsupported")
             publish {
                 publishMode = PublishMode.Never
             }

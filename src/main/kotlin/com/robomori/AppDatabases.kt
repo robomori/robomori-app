@@ -965,7 +965,9 @@ internal class AppDatabasesState(
             throw cancelled
         } catch (encrypted: EncryptedDatabaseException) {
             DatabaseLoad.Encrypted
-        } catch (failure: Exception) {
+        } catch (failure: Throwable) {
+            // Errors too, such as a class missing from the runtime: Robomori reopens this page at launch, so a crash
+            // here would close it every time it opened.
             DatabaseLoad.Failed(failure)
         }
         // A copy that fails while following changes leaves the last one shown, and says so; the next check tries again.

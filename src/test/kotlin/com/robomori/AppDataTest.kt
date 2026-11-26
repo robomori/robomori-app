@@ -233,6 +233,18 @@ class AppDataTest {
         (result as QueryState.Done).result
     }
 
+    @Test fun `a database that can't be opened shows as failed instead of closing the app`() = runBlocking {
+        sql("CREATE TABLE items(id INTEGER PRIMARY KEY)")
+        val broken = object : DeviceFileTransport by device() {
+            override fun pull(serial: String, command: String, destination: File, onProgress: (Long) -> Unit) =
+                throw NoClassDefFoundError("java/sql/SQLException")
+        }
+        val databases = state(broken)
+        databases.chooseApp(pantry)
+        withTimeout(5000) { while (databases.load !is DatabaseLoad.Failed) delay(10) }
+        databases.close()
+    }
+
     @Test fun `searches a table, writes through a query, adds and deletes rows, and saves a copy`() = runBlocking {
         sql("CREATE TABLE items(id INTEGER PRIMARY KEY, name TEXT NOT NULL)")
         sql("INSERT INTO items(name) VALUES ('Milk'), ('Eggs'), ('Oat milk')")

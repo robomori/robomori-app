@@ -287,10 +287,7 @@ internal fun LicenseOfferPage(topInset: Dp, onAction: (OnboardingAction) -> Unit
 internal fun TrialEndedScreen(state: AppState, topInset: Dp) {
     var activating by remember { mutableStateOf(false) }
     OnboardingSplitPage("TrialEnded", topInset, "Your free trial has ended", "Buy a license to keep using $APP_NAME.\n$UpsellGuarantee",
-        features = LicensedFeatures, corner = {
-            if (developmentBuild) Button(onClick = { state.openSettings(SettingsSection.Debug) }, style = ButtonStyle.Ghost,
-                tag = "TrialEndedDebug") { Label("Debug Settings") }
-        }) {
+        features = LicensedFeatures) {
         Button(onClick = { state.purchaseLicense(BuySource.TrialEnded) }, Modifier.fillMaxWidth(), style = ButtonStyle.Primary,
             size = ButtonSize.ExtraLarge, tag = "TrialEndedBuy") { Label("Buy a license") }
         Button(onClick = { activating = true }, Modifier.fillMaxWidth(), style = ButtonStyle.Ghost,

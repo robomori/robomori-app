@@ -35,6 +35,11 @@ internal class HostPlatform(
         HostOs.WINDOWS -> File(env("LOCALAPPDATA")?.let(::File) ?: File(home, "AppData/Local"), "Robomori/Cache")
         HostOs.LINUX -> File(env("XDG_CACHE_HOME")?.let(::File)?.takeIf(File::isAbsolute) ?: File(home, ".cache"), "Robomori")
     }
+    val logDirectory: File get() = when (os) {
+        HostOs.MAC -> File(home, "Library/Logs/Robomori")
+        HostOs.WINDOWS -> File(env("LOCALAPPDATA")?.let(::File) ?: File(home, "AppData/Local"), "Robomori/Logs")
+        HostOs.LINUX -> File(env("XDG_STATE_HOME")?.let(::File)?.takeIf(File::isAbsolute) ?: File(home, ".local/state"), "Robomori/logs")
+    }
     val defaultSdk: File get() = (env("ANDROID_HOME") ?: env("ANDROID_SDK_ROOT"))?.let(::File) ?: when (os) {
         HostOs.MAC -> File(home, "Library/Android/sdk")
         HostOs.WINDOWS -> File(env("LOCALAPPDATA")?.let(::File) ?: File(home, "AppData/Local"), "Android/Sdk")

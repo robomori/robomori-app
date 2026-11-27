@@ -91,6 +91,7 @@ internal object PagePath {
         SettingsSection.Network -> "network"
         SettingsSection.Updates -> "updates"
         SettingsSection.CommandLine -> "command-line"
+        SettingsSection.Logs -> "logs"
         SettingsSection.Debug -> "debug"
     }
 }

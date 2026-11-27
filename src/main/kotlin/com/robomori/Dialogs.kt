@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.*
 import com.robomori.theme.RobomoriTheme
+import java.io.File
 import androidx.compose.ui.*
 import androidx.compose.ui.awt.LocalAwtWindow
 import androidx.compose.ui.graphics.Color
@@ -449,6 +450,35 @@ private fun licenseUpdatesText(license: AppLicense): String {
             CheckboxRow("Automatically check for updates", updates.automatic, updates::changeAutomatic)
         }
     }
+}
+
+@Composable fun LogsPage(state: AppState) {
+    SettingsPageScaffold(SettingsSection.Logs.title, "LogsPage") {
+        Card(contentPadding = PaddingValues(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text("Application Logs")
+                    state.logsExport.failure?.let { failure ->
+                        Label(failure.message ?: "Could not export the logs. Try again.",
+                            color = RobomoriTheme.colors.danger, modifier = Modifier.testTag("ExportLogsError"))
+                    }
+                }
+                Button(onClick = { chooseLogsExport()?.let(state::exportLogs) }, style = ButtonStyle.Secondary, tag = "ExportLogs",
+                    enabled = !state.logsExport.isRunning) { Label("Export Logs…") }
+            }
+        }
+    }
+}
+
+/** Asks where to save the exported logs, on the Desktop to start with. */
+private fun chooseLogsExport(): File? {
+    val dialog = java.awt.FileDialog(null as java.awt.Frame?, "Export Logs", java.awt.FileDialog.SAVE).apply {
+        directory = File(userHome, "Desktop").takeIf(File::isDirectory)?.path
+        file = "robomori-logs-${java.time.LocalDate.now()}.zip"
+        isVisible = true
+    }
+    val chosen = dialog.file ?: return null
+    return File(dialog.directory, chosen)
 }
 
 @Composable internal fun CommandLinePage(command: CommandLineToolState, skill: AgentSkillState) {

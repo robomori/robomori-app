@@ -17,6 +17,12 @@ class HostPlatformTest {
         assertEquals(File(custom, "Robomori"), host(HostOs.LINUX, mapOf("XDG_CACHE_HOME" to custom.path)).cacheDirectory)
     }
 
+    @Test fun `logs use each platform's log directory`() {
+        assertEquals(File(root, "Library/Logs/Robomori"), host(HostOs.MAC).logDirectory)
+        assertEquals(File(root, "AppData/Local/Robomori/Logs"), host(HostOs.WINDOWS).logDirectory)
+        assertEquals(File(root, ".local/state/Robomori/logs"), host(HostOs.LINUX).logDirectory)
+    }
+
     @Test fun `defaults follow each desktop platform`() {
         val mac = host(HostOs.MAC)
         assertEquals(File(root, "Library/Application Support/Robomori"), mac.configDirectory)

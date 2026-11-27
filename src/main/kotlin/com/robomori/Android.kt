@@ -113,10 +113,11 @@ fun androidCommandError(output: String, exitCode: Int): String {
 }
 
 /** [streamed] output goes only to the output callback, for commands that run for long; the result is then empty. */
+/** [log] names the file a detached command's output is kept in; without one, its output is discarded. */
 data class Command(val executable: File, val args: List<String>, val env: Map<String, String> = emptyMap(), val input: String? = null, val detached: Boolean = false,
-                   val streamed: Boolean = false)
+                   val streamed: Boolean = false, val log: String? = null)
 fun interface CommandExecutor { fun run(command: Command, cancelled: AtomicBoolean, output: (String) -> Unit): String }
-class ProcessExecutor : CommandExecutor {
+class ProcessExecutor(private val logs: AppLogs = AppLogs()) : CommandExecutor {
     override fun run(command: Command, cancelled: AtomicBoolean, output: (String) -> Unit): String {
         // cmd.exe treats semicolons as batch argument separators. Quote every
         // argument, including SDK package IDs that contain no spaces.
@@ -129,7 +130,9 @@ class ProcessExecutor : CommandExecutor {
         val builder = ProcessBuilder(listOf(command.executable.path) + arguments).redirectErrorStream(true)
         builder.environment().putAll(command.env)
         if (command.detached) {
-            builder.redirectOutput(ProcessBuilder.Redirect.DISCARD).start().outputStream.close()
+            // A log that can't be written must not stop the process from starting.
+            val log = command.log?.let { runCatching { logs.processLog(it, listOf(command.executable.path) + arguments) }.getOrNull() }
+            builder.redirectOutput(log?.let(ProcessBuilder.Redirect::appendTo) ?: ProcessBuilder.Redirect.DISCARD).start().outputStream.close()
             return ""
         }
         val process = builder.start()
@@ -294,7 +297,7 @@ data class CreateSpec(val name: String, val image: SystemImage, val profile: Str
 class AndroidService(val settings: AppSettings, private val executor: CommandExecutor = ProcessExecutor()) {
     val toolchain = Toolchain(settings)
     val avdRoot = expandPath(settings.avds)
-    fun command(executable: File, args: List<String>, cancelled: AtomicBoolean = AtomicBoolean(), input: String? = null, detached: Boolean = false, environment: Map<String, String> = emptyMap(), streamed: Boolean = false, output: (String) -> Unit = {}): String {
+    fun command(executable: File, args: List<String>, cancelled: AtomicBoolean = AtomicBoolean(), input: String? = null, detached: Boolean = false, environment: Map<String, String> = emptyMap(), streamed: Boolean = false, log: String? = null, output: (String) -> Unit = {}): String {
         val arguments = if (settings.sdkmanager.isNotBlank() && executable == toolchain.sdkmanager)
             args + "--sdk_root=${toolchain.root.path}" else args
         val toolEnvironment = if (settings.avdmanager.isNotBlank() && executable == toolchain.avdmanager) {
@@ -304,7 +307,7 @@ class AndroidService(val settings: AppSettings, private val executor: CommandExe
             val quoted = if (HostOs.detect() == HostOs.WINDOWS) "\"$option\"" else "'${option.replace("'", "'\\''")}'"
             mapOf("AVDMANAGER_OPTS" to listOfNotNull(System.getenv("AVDMANAGER_OPTS"), quoted).joinToString(" "))
         } else emptyMap()
-        return executor.run(Command(executable, arguments, mapOf("ANDROID_AVD_HOME" to avdRoot.path, "ANDROID_HOME" to toolchain.root.path, "ANDROID_SDK_ROOT" to toolchain.root.path) + toolEnvironment + environment, input, detached, streamed), cancelled, output)
+        return executor.run(Command(executable, arguments, mapOf("ANDROID_AVD_HOME" to avdRoot.path, "ANDROID_HOME" to toolchain.root.path, "ANDROID_SDK_ROOT" to toolchain.root.path) + toolEnvironment + environment, input, detached, streamed, log), cancelled, output)
     }
     // Skips hidden files, such as the ._Name.ini metadata macOS writes next to each file on exFAT and other non-Apple drives.
     fun devices(): List<Device> = avdRoot.listFiles().orEmpty().filter { it.extension == "ini" && !it.name.startsWith(".") }.sortedBy { it.name.lowercase() }.mapNotNull { ini ->
@@ -384,7 +387,7 @@ class AndroidService(val settings: AppSettings, private val executor: CommandExe
         val skin = device.config["skin.path"]?.let(::File)
         if (device.config["showDeviceFrame"] != "no" && skin?.isDirectory == true) args += listOf("-skindir", skin.parent, "-skin", skin.name)
         args += hostMediaArgs(device.config, media, hostCameras())
-        command(toolchain.emulator, args, detached = true)
+        command(toolchain.emulator, args, detached = true, log = "emulator-${device.name}")
         if (media.microphone != null) startMicrophoneForwarder()
     }
     /** Starts the background process that feeds the chosen microphone to emulators. It ends itself once idle. */

@@ -36,6 +36,7 @@ sealed class SettingsSection(val title: String, val id: String) {
     data object Network : SettingsSection("Network", "Network")
     data object Updates : SettingsSection("Updates", "Updates")
     data object CommandLine : SettingsSection("CLI & Agents", "CommandLine")
+    data object Logs : SettingsSection("Logs", "Logs")
     /** Development runs only: switches for seeing the app as people do. */
     data object Debug : SettingsSection("Debug", "Debug")
 }
@@ -64,7 +65,7 @@ fun SettingsScreen(state: AppState, topInset: Dp) {
             }
             Spacer(Modifier.height(16.dp))
             (listOf(SettingsSection.License, SettingsSection.Storage, SettingsSection.Images, SettingsSection.CommandLine, SettingsSection.Media, SettingsSection.Graphics, SettingsSection.Network,
-                SettingsSection.Updates) + listOfNotNull(SettingsSection.Debug.takeIf { developmentBuild }))
+                SettingsSection.Updates, SettingsSection.Logs) + listOfNotNull(SettingsSection.Debug.takeIf { developmentBuild }))
                 .forEach { section ->
                     val icon = when (section) {
                         SettingsSection.License -> Icons.Key
@@ -75,6 +76,7 @@ fun SettingsScreen(state: AppState, topInset: Dp) {
                         SettingsSection.Network -> Icons.ArrowRightLeft
                         SettingsSection.Updates -> Icons.ArrowDownTray
                         SettingsSection.CommandLine -> Icons.AppWindow
+                        SettingsSection.Logs -> Icons.Document
                         SettingsSection.Debug -> Icons.Bug
                     }
                     SidebarListItem(selected = state.settingsSection == section, height = 32.dp,
@@ -107,6 +109,7 @@ fun SettingsScreen(state: AppState, topInset: Dp) {
                 SettingsSection.Network -> NetworkPage(state.localhostPorts)
                 SettingsSection.Updates -> UpdatesPage(state)
                 SettingsSection.CommandLine -> CommandLinePage(state.commandLine, state.agentSkill)
+                SettingsSection.Logs -> LogsPage(state)
                 SettingsSection.Debug -> DebugPage(state)
             }
         }

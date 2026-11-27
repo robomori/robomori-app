@@ -38,6 +38,8 @@ class AppState(val scope: CoroutineScope, private val store: SettingsStore = Set
                private val graphicsStore: EmulatorGraphicsStore? = null,
                /** Heard when a screenshot is saved; silent when absent, as in tests. */
                private val shutterSound: ShutterSound = ShutterSound.None,
+               /** Where failures are written for Export Logs; none keeps nothing, as in tests. */
+               private val logs: AppLogs? = null,
                private val storagePlanner: (CreateSpec, AppSettings) -> StoragePlan = ::planDeviceStorage) {
     var settings by mutableStateOf(initial); private set
     /** The settings file's save time when it was last read, so only changes made after that are picked up. */
@@ -688,6 +690,7 @@ class AppState(val scope: CoroutineScope, private val store: SettingsStore = Set
                         launched += device.name
                     } catch (e: Exception) {
                         if (e is CancellationException) throw e
+                        logs?.record("Could not launch ${device.name}", e)
                         failedToStart += device.displayName
                         starting = starting - device.name
                     }
@@ -701,7 +704,11 @@ class AppState(val scope: CoroutineScope, private val store: SettingsStore = Set
                     while (!running.keys.containsAll(launched)) { refresh(); delay(1000) }
                     true
                 } ?: false
-                if (!started) failedToStart += targets.filter { it.name in launched && it.name !in running }.map { it.displayName }
+                if (!started) {
+                    val missing = targets.filter { it.name in launched && it.name !in running }
+                    logs?.record("${missing.joinToString { it.name }} did not connect to adb within 90 seconds. Connected: ${running.keys.joinToString().ifEmpty { "none" }}")
+                    failedToStart += missing.map { it.displayName }
+                }
                 targets.filter { it.name in launched && it.name in running }.forEach { analytics.track(FunnelEvent.DeviceStarted, emulatorMetadata(it)) }
                 targets.filter { it.name in launched }.mapNotNull { running[it.name] }.forEach { serial ->
                     scope.launch { clearStaleNetworkRoute(backend, serial) }
@@ -721,11 +728,33 @@ class AppState(val scope: CoroutineScope, private val store: SettingsStore = Set
                 }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
+                logs?.record("Could not follow the start of ${names.joinToString()}", e)
                 failedToStart += targets.filter { it.name !in running }.map { it.displayName }
             } finally { starting = starting - names }
             // A failed start matters more than initial setup, and only one notice shows at a time.
             if (failedToStart.isNotEmpty()) notifyFailure(FailedOperation.Start(failedToStart.distinct()))
             else if (failedSetup.isNotEmpty()) notifyFailure(FailedOperation.InitialSetup(failedSetup))
+        }
+    }
+    /** Export Logs' progress, shown on the Updates page. */
+    var logsExport by mutableStateOf<OperationState>(OperationState.Idle); private set
+    /** Zips the logs, with diagnostics about the SDK and this computer, into [target] for a support request. */
+    fun exportLogs(target: File) {
+        val logs = logs ?: return
+        if (logsExport.isRunning) return
+        logsExport = OperationState.Running
+        val backend = service
+        scope.launch {
+            logsExport = try {
+                withContext(Dispatchers.IO) {
+                    val diagnostics = runCatching { backend.diagnostics() }.getOrElse { "Could not read diagnostics: ${it.stackTraceToString()}" }
+                    logs.export(target, diagnostics)
+                }
+                OperationState.Succeeded
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                OperationState.Failed(e)
+            }
         }
     }
     private fun forEachDevice(devices: List<Device>, block: (Device) -> Unit) {

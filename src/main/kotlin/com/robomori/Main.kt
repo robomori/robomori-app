@@ -62,6 +62,7 @@ fun main(args: Array<String>) {
     val crashed = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, failure ->
         keepEmulatorsOnExit.set(true)
+        AppLogs().record("Crashed on ${thread.name}", failure)
         crashed?.uncaughtException(thread, failure) ?: failure.printStackTrace()
     }
     if (!AotRuntime.isTraining()) Runtime.getRuntime().addShutdownHook(Thread {
@@ -91,7 +92,7 @@ fun main(args: Array<String>) {
         val state = remember {
             val analytics = appAnalytics().also { trackLaunch(it) }
             AppState(scope, catalogCache = SdkCatalogCache(), mediaStore = EmulatorMediaStore(), graphicsStore = EmulatorGraphicsStore(), welcome = WelcomeNotice(), shutterSound = ShutterSound.CameraClick,
-                analytics = analytics).also {
+                analytics = analytics, logs = AppLogs()).also {
                 it.keepCatalogFresh(); it.watchCameraUse(); it.watchGraphicsCrashes()
                 if (!AotRuntime.isTraining()) {
                     it.watchOutsideChanges(); it.commandLine.refresh(); it.agentSkill.refresh(); it.localhostPorts.keepApplied()

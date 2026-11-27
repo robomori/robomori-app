@@ -121,7 +121,7 @@ internal fun SetupRow(icon: @Composable () -> Unit, title: String, status: Strin
  */
 @Composable
 internal fun OnboardingSplitPage(tag: String, topInset: Dp, title: String, subtitle: String, features: List<Feature>,
-                                 corner: @Composable () -> Unit, actions: @Composable ColumnScope.() -> Unit) {
+                                 corner: (@Composable () -> Unit)? = null, actions: @Composable ColumnScope.() -> Unit) {
     Row(Modifier.fillMaxSize().background(RobomoriTheme.colors.panelBackground).padding(top = topInset).testTag(tag)) {
         FeatureGrid(features, Modifier.weight(1f).fillMaxHeight().padding(horizontal = 48.dp))
         Box(Modifier.weight(1f).fillMaxHeight()) {
@@ -135,7 +135,7 @@ internal fun OnboardingSplitPage(tag: String, topInset: Dp, title: String, subti
             Spacer(Modifier.height(32.dp))
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), content = actions)
         }
-        Box(Modifier.align(Alignment.BottomEnd).padding(24.dp)) { corner() }
+        corner?.let { Box(Modifier.align(Alignment.BottomEnd).padding(24.dp)) { it() } }
         }
     }
 }
